@@ -9,8 +9,12 @@ initialize() {
 	// - maybe in the case of different mutation rates/effects
 	initializeMutationType("m1", 0.5, "f", 0.0);
 	
-	// Do we need different GenomicElements?
+	// Do we need different GenomicElements? -no
 	initializeGenomicElementType("g1", m1, 1.0);
+	//initializeGenomicElementType("g1", c(m1, m2), c(10, 1));
+	//initializeGenomicElementType("g1", c(m1, m2), c(10/11, 1/11));
+	//should be the same
+	// this can do the mutation proportions 
 	initializeGenomicElement(g1, 0, 99999);
 	
 	//host mutations
@@ -23,11 +27,14 @@ initialize() {
 
 // each individual reproduces itself once
 
-reproduction() {
+reproduction(p1) {
 	// pathogen reproduction need 2 to have exponential growth
+	//addclone
 	p1.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
 	p1.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
+	}
 	
+reproduction(p2) {	
 	//host reproduction 
 	p2.addCrossed(individual, p2.sampleIndividuals(1));
 	// Is p2.sampleIndividuals(1) sampling from just the p2 population?
@@ -46,22 +53,29 @@ early() {
 	inds = p1.individuals;
 	inds[inds.age > 0].fitnessScaling = 0.0;
 	p1.fitnessScaling = K / sum(inds.age == 0);
+	// k to p2 count
+	
+	// removing mutations that apear in the wrong population
+	muts1 = sim.mutationsOfType(m1);  // pathogen mutations
+	muts2 = sim.mutationsOfType(m2); // host mutations
+	p1.individuals.genomes.removeMutations(muts2);
+	p2.individuals.genomes.removeMutations(muts1);
 	
 	// Host density-dependent selection 
 	host = p2.individuals;
-	host[host.age > 0].fitnessScaling = 0.0;
+	host[host.age > 15].fitnessScaling = 0.0; //want to change the age
 	p2.fitnessScaling = hK / sum(host.age == 0);
 }
 late() {
 	// Problems how to only look at the freqs od mutation in one subpopultation?
 	// is say that they are fixed at 0.5 but only in the pathogen not the host?
 	muts = sim.mutationsOfType(m1);
-	freqs = sim.mutationFrequencies(NULL, muts);
+	freqs = sim.mutationFrequencies(p1, muts);
 	if (any(freqs == 0.5))
-		sim.p1.genomes.removeMutations(muts[freqs == 0.5], T);
+		p1.genomes.removeMutations(muts[freqs == 0.5], T);
 		//might accomplish that in the line above
 	
-	//printing out pop 2 stats
+	//printing output pop 2 stats
 	inds = p2.individuals;
 	cat(sim.generation + ": " + size(inds));
 	catn(" (" + max(inds.age) + ", " + mean(inds.age) + ")");
@@ -73,4 +87,4 @@ late() {
 1000 late() {
 	sim.outputFixedMutations();
 }
-//in population visualization looks like there is gene flow, why?
+//in population visualization looks like there is gene flow, why? -fixed with 2 reproduction callbacks

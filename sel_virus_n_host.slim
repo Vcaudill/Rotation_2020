@@ -1,0 +1,149 @@
+initialize() {
+	initializeSLiMModelType("nonWF"); // makinf a non wf model
+	defineConstant("K", 100);	// pathogen carrying capacity
+	defineConstant("hK", 100);	// host carrying capacity
+	
+	//things to do with a QT and normalization
+	// evenually i want it to be depent on the number of mutations within eachother
+	defineConstant("optimum", 5.0);
+	defineConstant("sigma_K", 1.0);
+	defineConstant("sigma_C", 0.4);
+	defineConstant("NORM", dnorm(0.0, mean=0, sd=sigma_C));
+	
+	// neutral mutations, which are not allowed to fix?
+	initializeMutationType("m1", 0.5, "n", 0.0, 1.0);
+	m1.color = "red";
+	m1.convertToSubstitution = F;
+	
+	//host mutations
+	initializeMutationType("m2", 0.5, "n", 0.0, 1.0);
+	m2.color = "blue";
+	m2.convertToSubstitution = F;
+	
+	//Genomic Element
+	initializeGenomicElementType("g1", c(m1, m2), c(1, 1)); // mutation proportions
+	// right now # of mutations are even
+	//initializeGenomicElementType("g1", c(m1, m2), c(10/11, 1/11)); 
+	initializeGenomicElement(g1, 0, 99999);
+	initializeMutationRate(1e-7);
+	initializeRecombinationRate(1e-8);
+	
+	// interactions created 2 interactions might turn to 1 
+	// interaction of #host mutations
+	initializeInteractionType(1, "", reciprocal=T); // competition 
+	i1.setInteractionFunction("f", 1.0);
+	// interaction of #pathogen mutations
+	initializeInteractionType(2, "", reciprocal=T); // competition 
+	i2.setInteractionFunction("f", 1.0);
+}
+// to make the mutions truly neutral?
+fitness(m1) { return 1.0; }
+fitness(m2) { return 1.0; }
+
+reproduction(p1) {
+	// pathogen reproduction need 2 to have exponential growth
+	p1.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
+	p1.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
+}
+
+reproduction(p2) {
+	//host reproduction 
+	p2.addCrossed(individual, p2.sampleIndividuals(1));
+}
+
+1 early() {
+	sim.addSubpop("p1", 10); //pathogen initial population 
+	sim.addSubpop("p2", 10); //host initial population 
+}
+
+early() {
+
+	// removing mutations that apear in the wrong population
+	muts1 = sim.mutationsOfType(m1);  // pathogen mutations
+	muts2 = sim.mutationsOfType(m2); // host mutations
+	p1.individuals.genomes.removeMutations(muts2);
+	p2.individuals.genomes.removeMutations(muts1);
+
+	// Pathogen density-dependent selection but related to fitness?
+	// How does fitnessScaling work?
+	inds = p1.individuals;
+	//inds[inds.age > 0].fitnessScaling = 0.0;
+	p1.fitnessScaling = K / sum(inds.age == 0);
+	// k to p2 count
+	
+	
+	// Host density-dependent selection 
+	host = p2.individuals;
+	//host[host.age > 15].fitnessScaling = 0.0; //15 average age
+	p2.fitnessScaling = hK / sum(host.age == 0);
+}
+
+1: late() {
+	// trying to relate number of m1 to number of m2
+	inds_p = p1.individuals;
+	inds_h = p2.individuals;
+	
+	// construct phenotypes and fitness effects from QTLs 
+	phenotypes_h = inds_h.sumOfMutationsOfType(m2);
+	phenotypes_p = inds_p.sumOfMutationsOfType(m1);
+	if (mean(phenotypes_p) > 1)
+		inds_h.fitnessScaling = 1.0 + dnorm(phenotypes_h, mean(phenotypes_p), sigma_K);
+	else
+		inds_h.fitnessScaling = 1.0 + dnorm(phenotypes_h, optimum, sigma_K);
+	//inds_h.fitnessScaling = 1.0 + dnorm(phenotypes_h, optimum, sigma_K);
+	inds_h.tagF = phenotypes_h;
+
+	
+	// evaluate phenotypic competition 
+	i1.evaluate();
+	competition = sapply(inds_h, "sum(i1.strength(applyValue));");
+	effects = 1.0 - competition / size(inds_h);
+	inds_h.fitnessScaling = inds_h.fitnessScaling * effects;
+
+}
+
+//Do I need 2 of these? can it be done in 1?
+1: late() {
+	inds_p = p1.individuals;	
+	
+	// construct phenotypes and fitness effects from QTLs 
+	phenotypes_p = inds_p.sumOfMutationsOfType(m1);
+	inds_p.fitnessScaling = 1.0 + dnorm(phenotypes_p, optimum, sigma_K);
+	inds_p.tagF = phenotypes_p;
+
+	
+	// evaluate phenotypic competition 
+	i2.evaluate();
+	competition = sapply(inds_p, "sum(i1.strength(applyValue));");
+	effects = 1.0 - competition / size(inds_p);
+	inds_p.fitnessScaling = inds_p.fitnessScaling * effects;
+
+}
+
+// still unsure how interactions work
+interaction(i1) {
+	return dnorm(exerter.tagF, receiver.tagF, sigma_C) / NORM;  }
+	
+interaction(i2) {
+	return dnorm(exerter.tagF, receiver.tagF, sigma_C) / NORM;  }
+
+late() {
+	// fixed at 0.5 in the pathogen, but I dont want them fixed - need them to stay
+	muts = sim.mutationsOfType(m1);
+	freqs = sim.mutationFrequencies(p1, muts);
+	if (any(freqs == 0.5))
+		p1.genomes.removeMutations(muts[freqs == 0.5], T);
+	if (sim.generation % 100 == 1)
+	{
+		phenotypes_p = p1.individuals.tagF;
+		phenotypes_h = p2.individuals.tagF;
+		cat(format("%5d ", sim.generation));
+		cat(format("%6.2f ", mean(phenotypes_p)));
+		cat(format("%6.2f\n", mean(phenotypes_h)));
+	}
+
+}
+
+1000 late() {
+	sim.outputFixedMutations();
+}
