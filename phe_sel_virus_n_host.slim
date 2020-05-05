@@ -30,6 +30,7 @@ initialize() {
 	initializeRecombinationRate(1e-8);
 
 }
+
 // to make the mutions truly neutral?
 fitness(m1) { return 1.0; }
 fitness(m2) { return 1.0; }
@@ -48,8 +49,8 @@ reproduction(p2) {
 1 early() {
 	sim.addSubpop("p1", 1000); //pathogen initial population 
 	sim.addSubpop("p2", 1000); //host initial population 
-	p1.setSpatialBounds(c(0.0, 10.0)); // looking at the phenotype in color
-	p2.setSpatialBounds(c(0.0, 10.0)); // looking at the phenotype 
+	p1.setSpatialBounds(c(-10.0, 10.0)); // looking at the phenotype in color
+	p2.setSpatialBounds(c(-10.0, 10.0)); // looking at the phenotype 
 	//Colors correspond to fitness 
 }
 
@@ -62,13 +63,13 @@ early() {
 	p1.individuals.genomes.removeMutations(muts2);
 	p2.individuals.genomes.removeMutations(muts1);
 	
-//	
-//	inds = p1.individuals;
-//	//inds[inds.age > 0].fitnessScaling = 0.0;
-//	p1.fitnessScaling = K / sum(inds.age == 0);
+	//	
+	//	inds = p1.individuals;
+	//	//inds[inds.age > 0].fitnessScaling = 0.0;
+	//	p1.fitnessScaling = K / sum(inds.age == 0);
 }
 
-1: late() {
+1: early() {
 	// trying to relate number of m1 to number of m2
 	inds_p = p1.individuals;
 	inds_h = p2.individuals;
@@ -82,11 +83,13 @@ early() {
 	inds_p.x = phenotypes_p;
 	
 	// outcome of infection	
-	outcome = dnorm(phenotypes_h, phenotypes_p[infects], sigma_K);
-	outcome_p = dnorm(phenotypes_p, mean(phenotypes_p[infects]), sigma_K);
-	// how to make the viruse evolve so play war games?
-	
-	
+	outcome = sqrt(2 * 3.1415 * sigma_K) * dnorm(phenotypes_h, phenotypes_p[infects], sigma_K);
+
+	outcome_p = rep(0.0, p1.individualCount);
+	for (j in seqLen(p1.individualCount)) {
+		outcome_p[j] = sum(1 - outcome[infects == j]);
+	}
+
 	inds_h.fitnessScaling = 1 + outcome;
 	inds_p.fitnessScaling = 1 + outcome_p;
 	
@@ -98,10 +101,10 @@ early() {
 late() {
 	// fixed at 0.5 in the pathogen, is this correct?
 	// print the pop 1 mut freq 
-//	muts = sim.mutationsOfType(m1);
-//	freqs = sim.mutationFrequencies(p1, muts);
-//	if (any(freqs == 0.5))
-//		p1.genomes.removeMutations(muts[freqs == 0.5], F);
+	//	muts = sim.mutationsOfType(m1);
+	//	freqs = sim.mutationFrequencies(p1, muts);
+	//	if (any(freqs == 0.5))
+	//		p1.genomes.removeMutations(muts[freqs == 0.5], F);
 	if (sim.generation % 100 == 1)
 	{
 		phenotypes_p = p1.individuals.x;
