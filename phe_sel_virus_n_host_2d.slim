@@ -1,8 +1,8 @@
 initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
-	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
-	initializeTreeSeq(); 
-	defineConstant("K", 100);	// pathogen carrying capacity
+	initializeSLiMOptions(dimensionality="xy"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
+	initializeTreeSeq(); // to make trees
+	defineConstant("K", 1000);	// pathogen carrying capacity
 	defineConstant("hK", 1000);	// host carrying capacity
 	
 	//QT and normalization
@@ -14,16 +14,18 @@ initialize() {
 	
 	// neutral mutations, which are not allowed to fix?
 	initializeMutationType("m1", 0.5, "n", 0.0, 1.0);
+	initializeMutationType("m3", 0.5, "n", 0.0, 1.0);
 	m1.color = "red";
 	m1.convertToSubstitution = F;
 	
 	//host mutations
 	initializeMutationType("m2", 0.5, "n", 0.0, 1.0);
+	initializeMutationType("m4", 0.5, "n", 0.0, 1.0);
 	m2.color = "blue";
 	m2.convertToSubstitution = F;
 	
 	//Genomic Element
-	initializeGenomicElementType("g1", c(m1, m2), c(10, 1)); // mutation proportions
+	initializeGenomicElementType("g1", c(m1, m2, m3, m4), c(10, 1, 10, 1)); // mutation proportions
 	// right now # of mutations are even
 	//initializeGenomicElementType("g1", c(m1, m2), c(10/11, 1/11)); 
 	initializeGenomicElement(g1, 0, 99999);
@@ -35,6 +37,8 @@ initialize() {
 // to make the mutions truly neutral?
 fitness(m1) { return 1.0; }
 fitness(m2) { return 1.0; }
+fitness(m3) { return 1.0; }
+fitness(m4) { return 1.0; }
 
 reproduction(p1) {
 	// pathogen reproduction need 2 to have exponential growth
@@ -50,8 +54,8 @@ reproduction(p2) {
 1 early() {
 	sim.addSubpop("p1", 1000); //pathogen initial population 
 	sim.addSubpop("p2", 1000); //host initial population 
-	p1.setSpatialBounds(c(-100.0, 100.0)); // looking at the phenotype in color
-	p2.setSpatialBounds(c(-100.0, 100.0)); // looking at the phenotype 
+	p1.setSpatialBounds(c(-10.0, -10.0, 10, 10)); // looking at the phenotype in color
+	p2.setSpatialBounds(c(-10.0, -10.0, 10, 10)); // looking at the phenotype 
 	//Colors correspond to fitness 
 }
 
@@ -61,6 +65,10 @@ early() {
 	// removing mutations that apear in the wrong population
 	muts1 = sim.mutationsOfType(m1);  // pathogen mutations
 	muts2 = sim.mutationsOfType(m2); // host mutations
+	p1.individuals.genomes.removeMutations(muts2);
+	p2.individuals.genomes.removeMutations(muts1);
+	muts1 = sim.mutationsOfType(m3);  // pathogen mutations
+	muts2 = sim.mutationsOfType(m4); // host mutations
 	p1.individuals.genomes.removeMutations(muts2);
 	p2.individuals.genomes.removeMutations(muts1);
 	
@@ -78,13 +86,18 @@ early() {
 	infects = sample(seqLen(p1.individualCount), p2.individualCount, replace=T);
 	
 	// construct phenotypes and fitness effects from QTLs 
-	phenotypes_h = inds_h.sumOfMutationsOfType(m2);
-	phenotypes_p = inds_p.sumOfMutationsOfType(m1);
-	inds_h.x = phenotypes_h;
-	inds_p.x = phenotypes_p;
-	
+	phenotypes_hx = inds_h.sumOfMutationsOfType(m2);
+	phenotypes_px = inds_p.sumOfMutationsOfType(m1);
+	phenotypes_hy = inds_h.sumOfMutationsOfType(m4);
+	phenotypes_py = inds_p.sumOfMutationsOfType(m3);
+	inds_h.x = phenotypes_hx;
+	inds_p.x = phenotypes_px;
+	inds_h.y = phenotypes_hy;
+	inds_p.y = phenotypes_py;
+		
 	// outcome of infection	
-	outcome = sqrt(2 * 3.1415 * sigma_K) * dnorm(phenotypes_h, phenotypes_p[infects], sigma_K);
+	dist = sqrt((phenotypes_hx - phenotypes_px[infects])^2 + (phenotypes_hy - phenotypes_py[infects])^2);
+	outcome = sqrt(2 * 3.1415 * sigma_K^2) * dnorm(dist, 0.0, sigma_K);
 
 	outcome_p = rep(0.0, p1.individualCount);
 	for (j in seqLen(p1.individualCount)) {
@@ -99,27 +112,10 @@ early() {
 	p1.fitnessScaling = K / sum(inds_p.fitnessScaling);
 }
 
-late() {
-	// fixed at 0.5 in the pathogen, is this correct?
-	// print the pop 1 mut freq 
-	muts = sim.mutationsOfType(m1);
-	freqs = sim.mutationFrequencies(p1, muts);
-	if (any(freqs == 0.5))
-		p1.genomes.removeMutations(muts[freqs == 0.5], F);
-	cat(format("%6.2f\n", sum(2 * freqs * (1-freqs))));
-	if (sim.generation % 100 == 1)
-	{
-		phenotypes_p = p1.individuals.x;
-		phenotypes_h = p2.individuals.x;
-		cat(format("%5d ", sim.generation));
-		cat(format("%6.2f ", mean(phenotypes_p)));
-		cat(format("%6.2f\n", mean(phenotypes_h)));
-	}
 
-}
-
-1000 late() {
-	sim.outputFixedMutations();
-	//sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
-	sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees"); 
+10000 late() {
+	catn("done");
+	// sim.outputFixedMutations();
+	// sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
+	// sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees"); 
 }
