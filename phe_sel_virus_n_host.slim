@@ -1,6 +1,7 @@
 initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
+	initializeTreeSeq(); // to make trees
 	defineConstant("K", 100);	// pathogen carrying capacity
 	defineConstant("hK", 1000);	// host carrying capacity
 	
@@ -118,5 +119,6 @@ late() {
 
 10000 late() {
 	sim.outputFixedMutations();
-	sim.outputFull("~/Desktop/Rotation_2020/model_output.txt");
+	//sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
+	sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees"); 
 }
