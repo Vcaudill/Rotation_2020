@@ -2,7 +2,7 @@ initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
 	defineConstant("K", 100);	// pathogen carrying capacity
-	defineConstant("hK", 100);	// host carrying capacity
+	defineConstant("hK", 1000);	// host carrying capacity
 	
 	//QT and normalization
 	// evenually i want it to be depent on the number of mutations within eachother
@@ -22,7 +22,7 @@ initialize() {
 	m2.convertToSubstitution = F;
 	
 	//Genomic Element
-	initializeGenomicElementType("g1", c(m1, m2), c(1, 1)); // mutation proportions
+	initializeGenomicElementType("g1", c(m1, m2), c(10, 1)); // mutation proportions
 	// right now # of mutations are even
 	//initializeGenomicElementType("g1", c(m1, m2), c(10/11, 1/11)); 
 	initializeGenomicElement(g1, 0, 99999);
@@ -49,8 +49,8 @@ reproduction(p2) {
 1 early() {
 	sim.addSubpop("p1", 1000); //pathogen initial population 
 	sim.addSubpop("p2", 1000); //host initial population 
-	p1.setSpatialBounds(c(-10.0, 10.0)); // looking at the phenotype in color
-	p2.setSpatialBounds(c(-10.0, 10.0)); // looking at the phenotype 
+	p1.setSpatialBounds(c(-100.0, 100.0)); // looking at the phenotype in color
+	p2.setSpatialBounds(c(-100.0, 100.0)); // looking at the phenotype 
 	//Colors correspond to fitness 
 }
 
@@ -118,4 +118,5 @@ late() {
 
 10000 late() {
 	sim.outputFixedMutations();
+	sim.outputFull("~/Desktop/Rotation_2020/model_output.txt");
 }
