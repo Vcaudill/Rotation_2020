@@ -1,15 +1,15 @@
 initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
-	initializeTreeSeq(); 
-	defineConstant("K", 100);	// pathogen carrying capacity
-	defineConstant("hK", 1000);	// host carrying capacity
+	//initializeTreeSeq();
+	//defineConstant("K", 100);	// pathogen carrying capacity
+	//defineConstant("hK", 1000);	// host carrying capacity
 	
 	//QT and normalization
 	// evenually i want it to be depent on the number of mutations within eachother
 	defineConstant("optimum", 5.0);
-	defineConstant("sigma_K", 1.0); // tried diff value
-	defineConstant("sigma_C", 0.4); // tried diff value
+	//defineConstant("sigma_K", 1.0); // tried diff value
+	//defineConstant("sigma_C", 0.4); // tried diff value
 	defineConstant("NORM", dnorm(0.0, mean=0, sd=sigma_C)); //how does it work?
 	
 	// neutral mutations, which are not allowed to fix?
@@ -85,12 +85,12 @@ early() {
 	
 	// outcome of infection	
 	outcome = sqrt(2 * 3.1415 * sigma_K) * dnorm(phenotypes_h, phenotypes_p[infects], sigma_K);
-
+	
 	outcome_p = rep(0.0, p1.individualCount);
 	for (j in seqLen(p1.individualCount)) {
 		outcome_p[j] = sum(1 - outcome[infects == j]);
 	}
-
+	
 	inds_h.fitnessScaling = 1 + outcome;
 	inds_p.fitnessScaling = 1 + outcome_p;
 	
@@ -103,23 +103,41 @@ late() {
 	// fixed at 0.5 in the pathogen, is this correct?
 	// print the pop 1 mut freq 
 	muts = sim.mutationsOfType(m1);
+	mutsh = sim.mutationsOfType(m2);
 	freqs = sim.mutationFrequencies(p1, muts);
+	freqs_h = sim.mutationFrequencies(p2, mutsh);
 	if (any(freqs == 0.5))
 		p1.genomes.removeMutations(muts[freqs == 0.5], F);
-	cat(format("%6.2f\n", sum(2 * freqs * (1-freqs))));
-	if (sim.generation % 100 == 1)
-	{
-		phenotypes_p = p1.individuals.x;
-		phenotypes_h = p2.individuals.x;
-		cat(format("%5d ", sim.generation));
-		cat(format("%6.2f ", mean(phenotypes_p)));
-		cat(format("%6.2f\n", mean(phenotypes_h)));
+	
+	phenotypes_p = p1.individuals.x;
+	phenotypes_h = p2.individuals.x;
+	if (sim.generation == 1)
+	{catn( "gen	pheno_p	pheno_h	div_p	div_h	ind_p	ind_h	sig_K	sig_C");
 	}
+	
+	cat(format("%5d ", sim.generation));
+	cat(format("%6.2f ", mean(phenotypes_p)));
+	cat(format("%6.2f", mean(phenotypes_h)));
+	cat(format("%6.2f", sum(2 * freqs * (1-freqs))));
+	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h))));
+	cat(format("%5d", p1.individualCount));
+	cat(format("%5d", p2.individualCount));
+	cat(format("%6.2f", sigma_K));
+	cat(format("%6.2f \n", sigma_C));
+//	if (sim.generation % 100 == 1)
+//	{
+//		phenotypes_p = p1.individuals.x;
+//		phenotypes_h = p2.individuals.x;
+//		cat(format("%5d ", sim.generation));
+//		cat(format("%6.2f ", mean(phenotypes_p)));
+//		cat(format("%6.2f\n", mean(phenotypes_h)));
+//	}
 
 }
 
-1000 late() {
+10000 late() {
 	sim.outputFixedMutations();
 	//sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
-	sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees"); 
+	//sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees");
+	
 }

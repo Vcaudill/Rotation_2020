@@ -1,0 +1,6 @@
+// Initial random seed:
+1596896709165
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x');
