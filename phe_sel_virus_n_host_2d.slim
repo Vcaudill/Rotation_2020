@@ -112,6 +112,55 @@ early() {
 	p1.fitnessScaling = K / sum(inds_p.fitnessScaling);
 }
 
+late() {
+	// fixed at 0.5 in the pathogen
+	muts = sim.mutationsOfType(m1);
+	mutst = sim.mutationsOfType(m3);
+	mutsh = sim.mutationsOfType(m2);
+	mutsht = sim.mutationsOfType(m4);
+	
+	freqs = sim.mutationFrequencies(p1, muts);
+	freqst = sim.mutationFrequencies(p1, mutst);
+	freqs_h = sim.mutationFrequencies(p2, mutsh);
+	freqs_ht = sim.mutationFrequencies(p2, mutsht);
+	if (any(freqs == 0.5))
+		p1.genomes.removeMutations(muts[freqs == 0.5], F);
+	if (any(freqst == 0.5))
+		p1.genomes.removeMutations(mutst[freqst == 0.5], F);
+	
+	inds_p = p1.individuals;
+	inds_h = p2.individuals;
+	
+	phenotypes_hx = inds_h.sumOfMutationsOfType(m2);
+	phenotypes_px = inds_p.sumOfMutationsOfType(m1);
+	phenotypes_hy = inds_h.sumOfMutationsOfType(m4);
+	phenotypes_py = inds_p.sumOfMutationsOfType(m3);
+	
+	if (sim.generation == 1)
+	{catn( "gen	pheno_px	pheno_hx	pheno_py	pheno_hy	div_px	div_hx	div_py	div_hy	ind_p	ind_h	sig_K	sig_C");
+	}
+	
+	cat(format("%5d ", sim.generation));
+	cat(format("%6.2f ", mean(phenotypes_px)));
+	cat(format("%6.2f", mean(phenotypes_hx)));
+	cat(format("%6.2f ", mean(phenotypes_py)));
+	cat(format("%6.2f", mean(phenotypes_hy)));
+	cat(format("%6.2f", sum(2 * freqs * (1-freqs))));
+	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h))));
+	cat(format("%6.2f", sum(2 * freqst * (1-freqst))));
+	cat(format("%6.2f", sum(2 * freqs_ht * (1-freqs_ht))));
+	//sum of both mutations, should it have 4 terms?
+	//cat(format("%6.2f", sum(2 * freqs_ht * (1-freqs_ht) + 2 * freqs * (1-freqs) + 2 * freqst * (1-freqs) + 2 * freqs * (1-freqst))));
+	cat("	");
+	cat(format("%5d", p1.individualCount));
+	cat("	");
+	cat(format("%5d", p2.individualCount));
+	cat(format("%6.2f", sigma_K));
+	cat(format("%6.2f \n", sigma_C));
+
+}
+
+
 
 10000 late() {
 	catn("done");

@@ -2,8 +2,8 @@ initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
 	//initializeTreeSeq();
-	//defineConstant("K", 100);	// pathogen carrying capacity
-	//defineConstant("hK", 1000);	// host carrying capacity
+	//defineConstant("K", 10000);	// pathogen carrying capacity
+	//defineConstant("hK", 10000);	// host carrying capacity
 	
 	//QT and normalization
 	// evenually i want it to be depent on the number of mutations within eachother
@@ -120,7 +120,9 @@ late() {
 	cat(format("%6.2f", mean(phenotypes_h)));
 	cat(format("%6.2f", sum(2 * freqs * (1-freqs))));
 	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h))));
+	cat("	");
 	cat(format("%5d", p1.individualCount));
+	cat("	");
 	cat(format("%5d", p2.individualCount));
 	cat(format("%6.2f", sigma_K));
 	cat(format("%6.2f \n", sigma_C));
@@ -135,7 +137,7 @@ late() {
 
 }
 
-10000 late() {
+100 late() {
 	sim.outputFixedMutations();
 	//sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
 	//sim.treeSeqOutput("~/Desktop/Rotation_2020/tree_test.trees");
