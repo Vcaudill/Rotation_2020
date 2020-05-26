@@ -1,0 +1,2 @@
+gen	pheno_p	pheno_h	div_p	div_h	ind_p	ind_h	sig_K	sig_C
+    1   0.00   0.00  0.00  0.00       78     1000  0.90  1.00 

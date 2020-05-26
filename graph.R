@@ -2,12 +2,6 @@ library(ggplot2)
 
 file_info<- list.files("cut/tests", pattern=".txt")
 
-tenttest <- read.table("cut/exp_K_10000_hK_10000_sigma_K_1.0_sigma_C_0.4_trial_1.txt", header = TRUE)
-
-
-testfile <- read.table("text_test.txt")
-readfile <- read.table("file")
-thefile <- read.table("cut/exp_K_10_hK_100_sigma_K_1.0_sigma_C_0.4_trial_10.txt", header = TRUE)
 
 for (i in 1:length(file_info)){
   print(file_info[i])
