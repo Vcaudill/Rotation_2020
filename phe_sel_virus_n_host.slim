@@ -106,9 +106,9 @@ late() {
 	mutsh = sim.mutationsOfType(m2);
 	freqs = sim.mutationFrequencies(p1, muts);
 	freqs_h = sim.mutationFrequencies(p2, mutsh);
-	if (any(freqs == 0.5))
-		p1.genomes.removeMutations(muts[freqs == 0.5], F);
-	
+//	if (any(freqs == 0.5))
+//		p1.genomes.removeMutations(muts[freqs == 0.5], F);
+//	
 	phenotypes_p = p1.individuals.x;
 	phenotypes_h = p2.individuals.x;
 	if (sim.generation == 1)
