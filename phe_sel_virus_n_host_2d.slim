@@ -2,11 +2,10 @@ initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="xy"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
 	initializeTreeSeq(); // to make trees
-	//defineConstant("K", 1000);	// pathogen carrying capacity
-	//defineConstant("hK", 1000);	// host carrying capacity
+	//defineConstant("K", 100);	// pathogen carrying capacity
+	//defineConstant("hK", 100);	// host carrying capacity
 	
 	//QT and normalization
-	// evenually i want it to be depent on the number of mutations within eachother
 	defineConstant("optimum", 5.0);
 	//defineConstant("sigma_K", 1.0); // tried diff value
 	//defineConstant("sigma_C", 0.4); // tried diff value
@@ -156,12 +155,10 @@ late() {
 	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h)))); //div_hx
 	cat(format("%6.2f", sum(2 * freqst * (1-freqst)))); //div_py
 	cat(format("%6.2f", sum(2 * freqs_ht * (1-freqs_ht)))); //div_hy
-	cat(format("%6.2f ", eud)); //Euclidean distance 
+	cat(format("%6.2f ", eud)); //Euclidean distance from the mean is there something better to measure?
 	cat(format("%6.2f", sum(2 * h_freq * (1-h_freq)))); //div_h
 	cat(format("%6.2f", sum(2 * p_freq * (1-p_freq)))); //div_p
-	//sum of both mutations, should it have 4 terms?
-	//cat(format("%6.2f", sum(2 * freqs_ht * (1-freqs_ht) + 2 * freqs * (1-freqs) + 2 * freqst * (1-freqs) + 2 * freqs * (1-freqst))));
-	cat("	");
+	cat("	");//tab to keep pop size from merging
 	cat(format("%5d", p1.individualCount));
 	cat("	");
 	cat(format("%5d", p2.individualCount));
@@ -172,7 +169,7 @@ late() {
 
 
 
-1000 late() {
+50000 late() {
 	catn("done");
 	// sim.outputFixedMutations();
 	// sim.outputFull("~/Desktop/Rotation_2020/model_output.txt"); 
