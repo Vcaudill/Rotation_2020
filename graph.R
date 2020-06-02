@@ -3,11 +3,13 @@ library(gridExtra)
 library(gtable)
 
 #file_info<- list.files("cut/tests", pattern="exp")
-file_info<- list.files("two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
+#file_info<- list.files("two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
 #file_info<- list.files("cut/tests", pattern=".txt")
 test2d.txt
 file_2d=read.table("test2d.txt",header = TRUE)
-place<-"two_d_size/tests/"
+
+file_info<- list.files("size/tests", pattern="exp") #new files that i turned off the remove lines
+place<-"size/tests/"
 
 for (i in 1:length(file_info)){
   print(file_info[i])
@@ -26,8 +28,34 @@ for (i in 1:length(file_info)){
   file<-rbind(file,tempfile)
 }
 
-file$dif_pheno <- file$pheno_p - file$pheno_h
-file$dif_pi <- file$div_p - file$div_h
+file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
+
+
+
+
+file_2d_info<- list.files("two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
+place_2d<-"two_d_size/tests/"
+
+for (i in 1:length(file_2d_info)){
+  print(file_2d_info[i])
+  if(i == 1){
+    file_2d=read.table(paste0(place_2d,file_2d_info[1]),header = TRUE)
+    file_2d$trial <- strtoi(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[2], ".txt"))
+    file_2d$id <- i
+    file_2d$name<-file_2d_info[1]
+  }
+  tempfile <- read.table(paste0(place_2d,file_2d_info[i]), header = TRUE)
+  tempfile$trial <- strtoi(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[2], ".txt"))
+  tempfile$id <- i
+  tempfile$name<-file_2d_info[i]
+  file_2d<-rbind(file_2d,tempfile)
+}
+
+file_2d$dif_pheno <- file_2d$pheno_p - file_2d$pheno_h
+file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
+
+
+
 
 #data<-subset(file, ind_p >900 & ind_h >900 & trial ==1)
 
@@ -467,14 +495,14 @@ for(i in 1:length(unique(file$id))){
 }
 
 ## three plot on the same page 2d sim
-for(i in 1:length(unique(file$id))){
+for(i in 1:length(unique(file_2d$id))){
   #dev.off()
   png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/two_d/",subset(file, id == i)$name, ".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = div_h, color="H"), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = div_p, colour = 'P'), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = div_h, color="H"), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = div_p, colour = 'P'), size = 1)+
     
     #xlim(1000, 3000)+
     scale_colour_manual(name="Lines",
@@ -498,17 +526,15 @@ for(i in 1:length(unique(file$id))){
     xlab("Generation") + ylab("Pi (Diversity)")
   
   p1<- ggplot()+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = pheno_hx, color="H"), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = pheno_px, colour = 'P'), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = pheno_hy, color="Hy"), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = pheno_py, colour = 'Py'), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = eud, colour = 'E'), size = 1)+
-    
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hx, color="H"), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_px, colour = 'P'), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hy, color="Hy"), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_py, colour = 'Py'), size = 1)+
     scale_colour_manual(name="Lines",
-                        breaks=c("H", "P", "Hy", "Py", "E"), #, "PI",, "PP"
+                        breaks=c("H", "P", "Hy", "Py"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="navy","P"="firebrick", "Hy" = "blue", "Py"="red", "E"="green"), #, "PI"="orchid" , "PP"="seagreen")
-                        labels=c("Host", "Pathogen", "Host", "Pathogen", "E"))+ #, "Dif btw PI", , "Dif in Pi"
+                        values=c("H"="navy","P"="firebrick", "Hy" = "blue", "Py"="red"), #, "PI"="orchid" , "PP"="seagreen")
+                        labels=c("Host", "Pathogen", "Host", "Pathogen"))+ #, "Dif btw PI", , "Dif in Pi"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
     theme(axis.title.x=element_blank(),
@@ -523,17 +549,17 @@ for(i in 1:length(unique(file$id))){
           #panel.grid = element_blank(),
           panel.spacing.x = unit(0.5,"line"))+
     xlab("Generation") + ylab("Phenotype")+
-    labs(title = subset(file, id == i)$name, subtitle = "My Plots")
+    labs(title = subset(file_2d, id == i)$name, subtitle = "My Plots")
   
   p3<-ggplot()+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = dif_pheno, colour = 'PP'), size = 1)+
-    geom_point(data = subset(file, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = eud, colour = 'E'), size = 1)+
+    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
     #xlim(1000, 3000)+
     scale_colour_manual(name="Lines",
-                        breaks=c("PP", "PI"), #, "PI",, "PP"
+                        breaks=c("E", "PI"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("PP"="seagreen", "PI"="lightgreen"),
-                        labels=c("Dif in Pheno", "Dif btw PI"))+ 
+                        values=c("E"="seagreen", "PI"="lightgreen"),
+                        labels=c("Pheno E", "Dif btw PI"))+ 
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
     theme(axis.text.x = element_text(size=18,colour="Black"),
@@ -552,6 +578,7 @@ for(i in 1:length(unique(file$id))){
   g3 <- ggplotGrob(p3)  
   
   g<- rbind(g1,g2,g3, size="first")  
+  grid.arrange(g)
   print(grid.arrange(g))
   dev.off()
   
