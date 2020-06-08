@@ -91,8 +91,8 @@ early() {
 		outcome_p[j] = sum(1 - outcome[infects == j]);
 	}
 	
-	inds_h.fitnessScaling = 1 + outcome;
-	inds_p.fitnessScaling = 1 + outcome_p;
+	inds_h.fitnessScaling = 1 + outcome; //host
+	inds_p.fitnessScaling = 1 + outcome_p; //pathogen 
 	
 	// we want the sum of the fitness scalings to be hK:
 	p2.fitnessScaling = hK / sum(inds_h.fitnessScaling);

@@ -8,8 +8,8 @@ library(gtable)
 test2d.txt
 file_2d=read.table("test2d.txt",header = TRUE)
 
-file_info<- list.files("size/tests", pattern="exp") #new files that i turned off the remove lines
-place<-"size/tests/"
+file_info<- list.files("data/size/tests", pattern="exp") #new files that i turned off the remove lines
+place<-"data/size/tests/"
 
 for (i in 1:length(file_info)){
   print(file_info[i])
@@ -27,14 +27,14 @@ for (i in 1:length(file_info)){
   tempfile$name<-file_info[i]
   file<-rbind(file,tempfile)
 }
-
-file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
-
-
+file$dif_pheno <- file$pheno_p - file$pheno_h
+file$dif_pi <- file$div_p - file$div_h
 
 
-file_2d_info<- list.files("two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
-place_2d<-"two_d_size/tests/"
+
+
+file_2d_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
+place_2d<-"data/two_d_size/tests/"
 
 for (i in 1:length(file_2d_info)){
   print(file_2d_info[i])
@@ -323,7 +323,7 @@ file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
 ## three plot on the same page
 for(i in 1:length(unique(file$id))){
   #dev.off()
-  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/size/",subset(file, id == i)$name, ".png")[1])
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/size/",subset(file, id == i)$name,"_id_", i ,".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+
@@ -333,7 +333,7 @@ for(i in 1:length(unique(file$id))){
           scale_colour_manual(name="Lines",
                               breaks=c("H", "P"), #, "PI", "PP"
                               #c=c("chocolate3","cyan4", "green"),
-                              values=c("H"="lightblue","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
+                              values=c("H"="mediumpurple","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
                               labels=c("Host", "Pathogen"))+ #, "Dif btw PI", "Dif btw Phenotype"
           guides(colour = guide_legend(override.aes = list(size=4)))+
           theme_bw() + # setting up the theme
@@ -357,7 +357,7 @@ for(i in 1:length(unique(file$id))){
     scale_colour_manual(name="Lines",
                         breaks=c("H", "P"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="navy","P"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
+                        values=c("H"= "darkmagenta" ,"P"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
                         labels=c("Host", "Pathogen"))+ #, "Dif btw PI", , "Dif in Pi"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
@@ -410,7 +410,7 @@ print(grid.arrange(g))
 ## three zoom plot on the same page
 for(i in 1:length(unique(file$id))){
   #dev.off()
-  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/exp/size_zoom_",subset(file, id == i)$name, ".png")[1])
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/exp/size_zoom_",subset(file, id == i)$name,"_id_", i , ".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+
@@ -420,7 +420,7 @@ for(i in 1:length(unique(file$id))){
     scale_colour_manual(name="Lines",
                         breaks=c("H", "P"), #, "PI", "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="lightblue","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
+                        values=c("H"="mediumpurple","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
                         labels=c("Host", "Pathogen"))+ #, "Dif btw PI", "Dif btw Phenotype"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
@@ -444,7 +444,7 @@ for(i in 1:length(unique(file$id))){
     scale_colour_manual(name="Lines",
                         breaks=c("H", "P"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="navy","P"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
+                        values=c("H"="darkmagenta","P"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
                         labels=c("Host", "Pathogen"))+ #, "Dif btw PI", , "Dif in Pi"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
@@ -497,10 +497,11 @@ for(i in 1:length(unique(file$id))){
 ## three plot on the same page 2d sim
 for(i in 1:length(unique(file_2d$id))){
   #dev.off()
-  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/two_d/",subset(file, id == i)$name, ".png")[1])
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/two_d/",subset(file_2d, id == i)$name,"_id_", i , ".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+
+    
     geom_point(data = subset(file_2d, id == i), aes(x=gen, y = div_h, color="H"), size = 1)+
     geom_point(data = subset(file_2d, id == i), aes(x=gen, y = div_p, colour = 'P'), size = 1)+
     
@@ -508,7 +509,7 @@ for(i in 1:length(unique(file_2d$id))){
     scale_colour_manual(name="Lines",
                         breaks=c("H", "P"), #, "PI", "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="lightblue","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
+                        values=c("H"="mediumpurple","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
                         labels=c("Host", "Pathogen"))+ #, "Dif btw PI", "Dif btw Phenotype"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
@@ -526,15 +527,18 @@ for(i in 1:length(unique(file_2d$id))){
     xlab("Generation") + ylab("Pi (Diversity)")
   
   p1<- ggplot()+
-    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hx, color="H"), size = 1)+
-    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_px, colour = 'P'), size = 1)+
-    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hy, color="Hy"), size = 1)+
-    geom_point(data = subset(file_2d, id == i), aes(x=gen, y = pheno_py, colour = 'Py'), size = 1)+
+    geom_line(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hx, color="H"), size = 3)+
+    geom_line(data = subset(file_2d, id == i), aes(x=gen, y = pheno_hy, color="Hy"), linetype="dotted", size = 1)+
+    geom_line(data = subset(file_2d, id == i), aes(x=gen, y = pheno_px, colour = 'P'), size = 3)+
+    geom_line(data = subset(file_2d, id == i), aes(x=gen, y = pheno_py, colour = 'Py'), linetype="dotted", size = 1)+
+    #geom_line(linetype="dashed")+
+    #geom_line(linetype = "dotdash")
+    
     scale_colour_manual(name="Lines",
-                        breaks=c("H", "P", "Hy", "Py"), #, "PI",, "PP"
+                        breaks=c("H", "Hy","P",  "Py"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),
-                        values=c("H"="navy","P"="firebrick", "Hy" = "blue", "Py"="red"), #, "PI"="orchid" , "PP"="seagreen")
-                        labels=c("Host", "Pathogen", "Host", "Pathogen"))+ #, "Dif btw PI", , "Dif in Pi"
+                        values=c("H"="darkmagenta","Hy" = "darkmagenta", "P"="firebrick", "Py"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
+                        labels=c("Host X","Host Y", "Pathogen X",  "Pathogen Y"))+ #, "Dif btw PI", , "Dif in Pi"
     guides(colour = guide_legend(override.aes = list(size=4)))+
     theme_bw() + # setting up the theme
     theme(axis.title.x=element_blank(),
@@ -555,6 +559,7 @@ for(i in 1:length(unique(file_2d$id))){
     geom_point(data = subset(file_2d, id == i), aes(x=gen, y = eud, colour = 'E'), size = 1)+
     geom_point(data = subset(file_2d, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
     #xlim(1000, 3000)+
+   
     scale_colour_manual(name="Lines",
                         breaks=c("E", "PI"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),

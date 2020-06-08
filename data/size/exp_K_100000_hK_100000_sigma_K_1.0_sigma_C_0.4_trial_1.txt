@@ -1,0 +1,17 @@
+// Initial random seed:
+5833058624939
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x');
+initializeMutationType(1, 0.5, "n", 0, 1);
+initializeMutationType(2, 0.5, "n", 0, 1);
+initializeGenomicElementType(1, c(m1, m2), c(10, 1));
+initializeGenomicElement(g1, 0, 99999);
+initializeMutationRate(1e-07);
+initializeRecombinationRate(1e-08);
+
+// Starting run at generation <start>:
+1 
+
+gen	pheno_p	pheno_h	div_p	div_h	ind_p	ind_h	sig_K	sig_C
