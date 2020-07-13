@@ -8,6 +8,7 @@ library(gtable)
 test2d.txt
 file_2d=read.table("test2d.txt",header = TRUE)
 
+
 file_info<- list.files("data/size/tests", pattern="exp") #new files that i turned off the remove lines
 place<-"data/size/tests/"
 
@@ -30,8 +31,16 @@ for (i in 1:length(file_info)){
 file$dif_pheno <- file$pheno_p - file$pheno_h
 file$dif_pi <- file$div_p - file$div_h
 
+x <- function (p) 2 * p * (1 - p/2)
+y <- function (p) 2 * p * (1 - p)
+p <- function (x) 1 - sqrt(1-x)
+y(p(file$div_p))
+p(x(0.3))
+file$new_p<-p(y(file$div_p))
+file$new_p_pi <- 2*p(x(file$div_p))*(1-p(x(file$div_p)))
 
-
+pp <- runif(100)
+plot(y(pp), y(p(x(pp))))
 
 file_2d_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
 place_2d<-"data/two_d_size/tests/"
@@ -55,6 +64,27 @@ file_2d$dif_pheno <- file_2d$pheno_p - file_2d$pheno_h
 file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
 
 
+file_info<- list.files("data/", pattern="Ttexp") #new files that i turned off the remove lines
+place<-"data/"
+
+for (i in 1:length(file_info)){
+  print(file_info[i])
+  if(i == 1){
+    #file=read.table(paste0("cut/tests/",file_info[1]),header = TRUE)
+    Tfile=read.table(paste0(place,file_info[1]),header = TRUE)
+    Tfile$trial <- strtoi(strsplit(unlist(strsplit(file_info[1], "trial_"))[2], ".txt"))
+    Tfile$id <- i
+    Tfile$name<-file_info[1]
+  }
+  #tempfile <- read.table(paste0("cut/tests/",file_info[i]), header = TRUE)
+  tempfile <- read.table(paste0(place,file_info[i]), header = TRUE)
+  tempfile$trial <- strtoi(strsplit(unlist(strsplit(file_info[i], "trial_"))[2], ".txt"))
+  tempfile$id <- i
+  tempfile$name<-file_info[i]
+  Tfile<-rbind(Tfile,tempfile)
+}
+Tfile$dif_pheno <- Tfile$pheno_p - Tfile$pheno_h
+Tfile$dif_pi <- Tfile$div_p - Tfile$div_h
 
 
 #data<-subset(file, ind_p >900 & ind_h >900 & trial ==1)
@@ -560,6 +590,192 @@ for(i in 1:length(unique(file_2d$id))){
     geom_point(data = subset(file_2d, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
     #xlim(1000, 3000)+
    
+    scale_colour_manual(name="Lines",
+                        breaks=c("E", "PI"), #, "PI",, "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("E"="seagreen", "PI"="lightgreen"),
+                        labels=c("Pheno E", "Dif btw PI"))+ 
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.text.x = element_text(size=18,colour="Black"),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Difference")
+  
+  g1 <- ggplotGrob(p1)  
+  g2 <- ggplotGrob(p2)  
+  g3 <- ggplotGrob(p3)  
+  
+  g<- rbind(g1,g2,g3, size="first")  
+  grid.arrange(g)
+  print(grid.arrange(g))
+  dev.off()
+  
+}
+
+
+
+#####Tfile
+
+
+for(i in 1:length(unique(Tfile$id))){
+  #dev.off()
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/Tt_",subset(Tfile, id == i)$name,"_id_", i ,".png")[1])
+  #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(Tfile, id == i)$name, ".pdf")[1])
+  
+  p2<- ggplot()+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = div_h, color="H"), size = 1)+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = div_p, colour = 'P'), size = 1)+
+    #xlim(1000, 3000)+
+    scale_colour_manual(name="Lines",
+                        breaks=c("H", "P"), #, "PI", "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("H"="mediumpurple","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
+                        labels=c("Host", "Pathogen"))+ #, "Dif btw PI", "Dif btw Phenotype"
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Pi (Diversity)")
+  
+  p1<- ggplot()+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = pheno_h, color="H"), size = 1)+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = pheno_p, colour = 'P'), size = 1)+
+    #xlim(1000, 3000)+
+    scale_colour_manual(name="Lines",
+                        breaks=c("H", "P"), #, "PI",, "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("H"= "darkmagenta" ,"P"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
+                        labels=c("Host", "Pathogen"))+ #, "Dif btw PI", , "Dif in Pi"
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Phenotype")+
+    labs(title = subset(Tfile, id == i)$name, subtitle = "My Plots")
+  
+  p3<-ggplot()+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = dif_pheno, colour = 'PP'), size = 1)+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
+    #xlim(1000, 3000)+
+    scale_colour_manual(name="Lines",
+                        breaks=c("PP", "PI"), #, "PI",, "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("PP"="seagreen", "PI"="lightgreen"),
+                        labels=c("Dif in Pheno", "Dif btw PI"))+ 
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.text.x = element_text(size=18,colour="Black"),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Difference")
+  
+  g1 <- ggplotGrob(p1)  
+  g2 <- ggplotGrob(p2)  
+  g3 <- ggplotGrob(p3)  
+  
+  g<- rbind(g1,g2,g3, size="first")  
+  print(grid.arrange(g))
+  dev.off()
+  
+}
+
+
+for(i in 1:length(unique(Tfile$id))){
+  #dev.off()
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/two_d_",subset(Tfile, id == i)$name,"_id_", i , ".png")[1])
+  #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
+  
+  p2<- ggplot()+
+    
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = div_h, color="H"), size = 1)+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = div_p, colour = 'P'), size = 1)+
+    
+    #xlim(1000, 3000)+
+    scale_colour_manual(name="Lines",
+                        breaks=c("H", "P"), #, "PI", "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("H"="mediumpurple","P"="pink"), #, "PI"="orchid", "PP"="lightgreen"
+                        labels=c("Host", "Pathogen"))+ #, "Dif btw PI", "Dif btw Phenotype"
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Pi (Diversity)")
+  
+  p1<- ggplot()+
+    geom_line(data = subset(Tfile, id == i), aes(x=gen, y = pheno_hx, color="H"), size = 3)+
+    geom_line(data = subset(Tfile, id == i), aes(x=gen, y = pheno_hy, color="Hy"), linetype="dotted", size = 1)+
+    geom_line(data = subset(Tfile, id == i), aes(x=gen, y = pheno_px, colour = 'P'), size = 3)+
+    geom_line(data = subset(Tfile, id == i), aes(x=gen, y = pheno_py, colour = 'Py'), linetype="dotted", size = 1)+
+    #geom_line(linetype="dashed")+
+    #geom_line(linetype = "dotdash")
+    
+    scale_colour_manual(name="Lines",
+                        breaks=c("H", "Hy","P",  "Py"), #, "PI",, "PP"
+                        #c=c("chocolate3","cyan4", "green"),
+                        values=c("H"="darkmagenta","Hy" = "darkmagenta", "P"="firebrick", "Py"="firebrick"), #, "PI"="orchid" , "PP"="seagreen")
+                        labels=c("Host X","Host Y", "Pathogen X",  "Pathogen Y"))+ #, "Dif btw PI", , "Dif in Pi"
+    guides(colour = guide_legend(override.aes = list(size=4)))+
+    theme_bw() + # setting up the theme
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.text.y = element_text(size=18,colour="Black"),
+          text = element_text(size=14),
+          panel.grid.minor = element_blank(),
+          legend.box.background = element_rect(),
+          plot.title = element_text(size=12),
+          plot.subtitle = element_text(size=22),
+          #panel.grid = element_blank(),
+          panel.spacing.x = unit(0.5,"line"))+
+    xlab("Generation") + ylab("Phenotype")+
+    labs(title = subset(Tfile, id == i)$name, subtitle = "My Plots")
+  
+  p3<-ggplot()+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = eud, colour = 'E'), size = 1)+
+    geom_point(data = subset(Tfile, id == i), aes(x=gen, y = dif_pi, colour = 'PI'), size = 1)+
+    #xlim(1000, 3000)+
+    
     scale_colour_manual(name="Lines",
                         breaks=c("E", "PI"), #, "PI",, "PP"
                         #c=c("chocolate3","cyan4", "green"),

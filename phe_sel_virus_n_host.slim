@@ -2,14 +2,14 @@ initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="x"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
 	//initializeTreeSeq();
-	defineConstant("K", 100);	// pathogen carrying capacity
-	defineConstant("hK", 1000);	// host carrying capacity
+	//defineConstant("K", 10);	// pathogen carrying capacity
+	//defineConstant("hK", 100);	// host carrying capacity
 	
 	//QT and normalization
 	// evenually i want it to be depent on the number of mutations within eachother
 	defineConstant("optimum", 5.0);
-	defineConstant("sigma_K", 1.0); // tried diff value
-	defineConstant("sigma_C", 0.4); // tried diff value
+	//defineConstant("sigma_K", 1.0); // tried diff value
+	//defineConstant("sigma_C", 0.4); // tried diff value
 	defineConstant("NORM", dnorm(0.0, mean=0, sd=sigma_C)); //how does it work?
 	
 	// neutral mutations, which are not allowed to fix?
@@ -104,7 +104,7 @@ late() {
 	// print the pop 1 mut freq 
 	muts = sim.mutationsOfType(m1);
 	mutsh = sim.mutationsOfType(m2);
-	freqs = sim.mutationFrequencies(p1, muts);
+	freqs = 2 * sim.mutationFrequencies(p1, muts);
 	freqs_h = sim.mutationFrequencies(p2, mutsh);
 //	if (any(freqs == 0.5))
 //		p1.genomes.removeMutations(muts[freqs == 0.5], F);
@@ -118,7 +118,7 @@ late() {
 	cat(format("%5d ", sim.generation));
 	cat(format("%6.2f ", mean(phenotypes_p)));
 	cat(format("%6.2f", mean(phenotypes_h)));
-	cat(format("%6.2f", sum(4 * freqs * (1-freqs))));
+	cat(format("%6.2f", sum(2 * freqs * (1-freqs))));
 	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h))));
 	cat("	");
 	cat(format("%5d", p1.individualCount));

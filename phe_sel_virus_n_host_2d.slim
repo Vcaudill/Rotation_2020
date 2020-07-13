@@ -2,13 +2,13 @@ initialize() {
 	initializeSLiMModelType("nonWF"); // makinf a non wf model
 	initializeSLiMOptions(dimensionality="xy"); // Modeling phenotype, phenotype is a pseudo-spatial dimension pg 281
 	initializeTreeSeq(); // to make trees
-	defineConstant("K", 100);	// pathogen carrying capacity
-	defineConstant("hK", 100);	// host carrying capacity
+	//defineConstant("K", 100);	// pathogen carrying capacity
+	//defineConstant("hK", 100);	// host carrying capacity
 	
 	//QT and normalization
 	defineConstant("optimum", 5.0);
-	defineConstant("sigma_K", 1.0); // tried diff value
-	defineConstant("sigma_C", 0.4); // tried diff value
+	//defineConstant("sigma_K", 1.0); // tried diff value
+	//defineConstant("sigma_C", 0.4); // tried diff value
 	defineConstant("NORM", dnorm(0.0, mean=0, sd=sigma_C)); //how does it work?
 	
 	// neutral mutations, which are not allowed to fix?
@@ -118,12 +118,12 @@ late() {
 	mutsh = sim.mutationsOfType(m2);
 	mutsht = sim.mutationsOfType(m4);
 	
-	freqs = sim.mutationFrequencies(p1, muts);
-	freqst = sim.mutationFrequencies(p1, mutst);
+	freqs = 2 * sim.mutationFrequencies(p1, muts);
+	freqst = 2 * sim.mutationFrequencies(p1, mutst);
 	freqs_h = sim.mutationFrequencies(p2, mutsh);
 	freqs_ht = sim.mutationFrequencies(p2, mutsht);
 	
-	p_freq = sim.mutationFrequencies(p1);
+	p_freq = 2 * sim.mutationFrequencies(p1);
 	h_freq = sim.mutationFrequencies(p2);
 	
 	
@@ -147,17 +147,27 @@ late() {
 	}
 	
 	cat(format("%5d ", sim.generation)); //gen
+	cat("	");
 	cat(format("%6.2f ", mean(phenotypes_px))); //pheno_px
+	cat("	");
 	cat(format("%6.2f", mean(phenotypes_hx))); //pheno_hx
+	cat("	");
 	cat(format("%6.2f ", mean(phenotypes_py))); //pheno_py
+	cat("	");
 	cat(format("%6.2f", mean(phenotypes_hy))); //pheno_hx
-	cat(format("%6.2f", sum(4 * freqs * (1-freqs)))); //div_px
+	cat("	");
+	cat(format("%6.2f", sum(2 * freqs * (1-freqs)))); //div_px
+	cat("	");
 	cat(format("%6.2f", sum(2 * freqs_h * (1-freqs_h)))); //div_hx
-	cat(format("%6.2f", sum(4 * freqst * (1-freqst)))); //div_py
+	cat("	");
+	cat(format("%6.2f", sum(2 * freqst * (1-freqst)))); //div_py
+	cat("	");
 	cat(format("%6.2f", sum(2 * freqs_ht * (1-freqs_ht)))); //div_hy
+	cat("	");
 	cat(format("%6.2f ", eud)); //Euclidean distance from the mean is there something better to measure?
 	cat(format("%6.2f", sum(2 * h_freq * (1-h_freq)))); //div_h
-	cat(format("%6.2f", sum(4 * p_freq * (1-p_freq)))); //div_p
+	cat("	");
+	cat(format("%6.2f", sum(2 * p_freq * (1-p_freq)))); //div_p
 	cat("	");//tab to keep pop size from merging
 	cat(format("%5d", p1.individualCount));
 	cat("	");
