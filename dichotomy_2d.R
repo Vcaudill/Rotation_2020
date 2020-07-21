@@ -4,26 +4,34 @@ library(gtable)
 library(plotrix)
 library(viridis) 
 
-file_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
+file_2d_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
 place<-"data/two_d_size/tests/"
-dichotomy_2d<-data.frame(id= integer(length(file_info)), name = character(length(file_info)), v=integer(length(file_info)), h=integer(length(file_info)), sK=integer(length(file_info)), sC=integer(length(file_info)), d_mean = integer(length(file_info)), sd = integer(length(file_info)), se=integer(length(file_info)),stringsAsFactors=FALSE)
+file_2d_info<- list.files("raw_data/cut_data", pattern="exp_2d") #new files that i turned off the remove lines
+place_2d<-"raw_data/cut_data/"
 
-for (i in 1:length(file_info)){
-  print(file_info[i])
+dichotomy_2d<-data.frame(id= integer(length(file_2d_info)), name = character(length(file_2d_info)), v=integer(length(file_2d_info)), h=integer(length(file_2d_info)), sK=integer(length(file_2d_info)), sC=integer(length(file_2d_info)), d_mean = integer(length(file_2d_info)), sd = integer(length(file_2d_info)), se=integer(length(file_2d_info)),stringsAsFactors=FALSE)
+
+for (i in 1:length(file_2d_info)){
+  print(file_2d_info[i])
   if(i == 1){
-    #file=read.table(paste0("cut/tests/",file_info[1]),header = TRUE)
-    file_2d=read.table(paste0(place,file_info[1]),header = TRUE)
-    file_2d$trial <- strtoi(strsplit(unlist(strsplit(file_info[1], "trial_"))[2], ".txt"))
+    #file=read.table(paste0("cut/tests/",file_2d_info[1]),header = TRUE)
+    file_2d=read.table(paste0(place,file_2d_info[1]),header = TRUE)
+    file_2d$trial <- strtoi(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[2], ".txt"))
     file_2d$id<- i
-    file_2d$name<-file_info[1]
+    file_2d$name<-file_2d_info[1]
+    file_2d$v<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[3])
+    file_2d$h<- as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[5])
+    file_2d$sK<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[8])
+    file_2d$sC<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[11])
+    
     #file_2d$dif_pheno <- file_2d$pheno_p - file_2d$pheno_h
     
     dichotomy_2d$id[1] <- i
-    dichotomy_2d$name[1]<-file_info[1]
-    dichotomy_2d$v[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[1], "trial_"))[1], "_"))[3])
-    dichotomy_2d$h[1]<- as.numeric(unlist(strsplit(unlist(strsplit(file_info[1], "trial_"))[1], "_"))[5])
-    dichotomy_2d$sK[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[1], "trial_"))[1], "_"))[8])
-    dichotomy_2d$sC[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[1], "trial_"))[1], "_"))[11])
+    dichotomy_2d$name[1]<-file_2d_info[1]
+    dichotomy_2d$v[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[3])
+    dichotomy_2d$h[1]<- as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[5])
+    dichotomy_2d$sK[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[8])
+    dichotomy_2d$sC[1]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[11])
     
     file_2d$dich = NA
     last_0 = 1
@@ -48,18 +56,23 @@ for (i in 1:length(file_info)){
     dichotomy_2d$close[1]<-close/nrow(file_2d)
     dichotomy_2d$lessclose[1]<-lessclose/nrow(file_2d)
   }
-  #tempfile <- read.table(paste0("cut/tests/",file_info[i]), header = TRUE)
-  tempfile <- read.table(paste0(place,file_info[i]), header = TRUE)
-  tempfile$trial <- strtoi(strsplit(unlist(strsplit(file_info[i], "trial_"))[2], ".txt"))
+  #tempfile <- read.table(paste0("cut/tests/",file_2d_info[i]), header = TRUE)
+  tempfile <- read.table(paste0(place,file_2d_info[i]), header = TRUE)
+  tempfile$trial <- strtoi(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[2], ".txt"))
   tempfile$id <- i
-  tempfile$name<-file_info[i]
+  tempfile$name<-file_2d_info[i]
+  tempfile$v<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[3])
+  tempfile$h<- as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[5])
+  tempfile$sK<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[8])
+  tempfile$sC<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[1], "trial_"))[1], "_"))[11])
+  
   
   dichotomy_2d$id[i] <- i
-  dichotomy_2d$name[i]<-file_info[i]
-  dichotomy_2d$v[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[3])
-  dichotomy_2d$h[i]<- as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[5])
-  dichotomy_2d$sK[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[8])
-  dichotomy_2d$sC[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[11])
+  dichotomy_2d$name[i]<-file_2d_info[i]
+  dichotomy_2d$v[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[1], "_"))[3])
+  dichotomy_2d$h[i]<- as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[1], "_"))[5])
+  dichotomy_2d$sK[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[1], "_"))[8])
+  dichotomy_2d$sC[i]<-as.numeric(unlist(strsplit(unlist(strsplit(file_2d_info[i], "trial_"))[1], "_"))[11])
   
   #tempfile$dif_pheno <- tempfile$pheno_p - tempfile$pheno_h
   tempfile$dich = NA

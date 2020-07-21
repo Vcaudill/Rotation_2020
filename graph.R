@@ -9,8 +9,11 @@ test2d.txt
 file_2d=read.table("test2d.txt",header = TRUE)
 
 
-file_info<- list.files("data/size/tests", pattern="exp") #new files that i turned off the remove lines
-place<-"data/size/tests/"
+#file_info<- list.files("data/size/tests", pattern="exp") #new files that i turned off the remove lines
+#place<-"data/size/tests/"
+
+file_info<- list.files("raw_data/cut_data", pattern="exp_K") #new files that i turned off the remove lines
+place<-"raw_data/cut_data/"
 
 for (i in 1:length(file_info)){
   print(file_info[i])
@@ -42,8 +45,11 @@ file$new_p_pi <- 2*p(x(file$div_p))*(1-p(x(file$div_p)))
 pp <- runif(100)
 plot(y(pp), y(p(x(pp))))
 
-file_2d_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
-place_2d<-"data/two_d_size/tests/"
+#file_2d_info<- list.files("data/two_d_size/tests", pattern="exp") #new files that i turned off the remove lines
+#place_2d<-"data/two_d_size/tests/"
+
+file_2d_info<- list.files("raw_data/cut_data", pattern="exp_2d") #new files that i turned off the remove lines
+place_2d<-"raw_data/cut_data/"
 
 for (i in 1:length(file_2d_info)){
   print(file_2d_info[i])
@@ -60,7 +66,7 @@ for (i in 1:length(file_2d_info)){
   file_2d<-rbind(file_2d,tempfile)
 }
 
-file_2d$dif_pheno <- file_2d$pheno_p - file_2d$pheno_h
+#file_2d$dif_pheno <- file_2d$pheno_p - file_2d$pheno_h
 file_2d$dif_pi <- file_2d$div_p - file_2d$div_h
 
 
@@ -353,7 +359,7 @@ Tfile$dif_pi <- Tfile$div_p - Tfile$div_h
 ## three plot on the same page
 for(i in 1:length(unique(file$id))){
   #dev.off()
-  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/size/",subset(file, id == i)$name,"_id_", i ,".png")[1])
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("raw_data/figures/",subset(file, id == i)$name,"_id_", i ,".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+
@@ -527,7 +533,7 @@ for(i in 1:length(unique(file$id))){
 ## three plot on the same page 2d sim
 for(i in 1:length(unique(file_2d$id))){
   #dev.off()
-  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("figures/two_d/",subset(file_2d, id == i)$name,"_id_", i , ".png")[1])
+  png(width=1024, height=768, units = "px", pointsize = 12, bg = "white", res = 100, paste0("raw_data/figures/2d_",subset(file_2d, id == i)$name,"_id_", i , ".png")[1])
   #pdf(width=10,height=7,pointsize=12, paste0("figures/exp/",subset(file, id == i)$name, ".pdf")[1])
   
   p2<- ggplot()+

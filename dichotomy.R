@@ -16,6 +16,11 @@ for (i in 1:length(file_info)){
     file$trial <- strtoi(strsplit(unlist(strsplit(file_info[1], "trial_"))[2], ".txt"))
     file$id<- i
     file$name<-file_info[1]
+    file$v<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[3])
+    file$h<- as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[5])
+    file$sK<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[8])
+    file$sC<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[11])
+    
     file$dif_pheno <- file$pheno_p - file$pheno_h
     
     dichotomy$id[1] <- i
@@ -48,6 +53,11 @@ for (i in 1:length(file_info)){
   tempfile$trial <- strtoi(strsplit(unlist(strsplit(file_info[i], "trial_"))[2], ".txt"))
   tempfile$id <- i
   tempfile$name<-file_info[i]
+  tempfile$v<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[3])
+  tempfile$h<- as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[5])
+  tempfile$sK<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[8])
+  tempfile$sC<-as.numeric(unlist(strsplit(unlist(strsplit(file_info[i], "trial_"))[1], "_"))[11])
+  
   
   dichotomy$id[i] <- i
   dichotomy$name[i]<-file_info[i]

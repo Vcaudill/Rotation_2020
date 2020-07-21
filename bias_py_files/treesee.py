@@ -145,11 +145,13 @@ For each node, find the smallest number of genealogical hops to one of focal_nod
 """
 
 
-#print("matrix", relatedness_matrix(tree_sequence) != relatedness_matrix(ts))
+# print("matrix", relatedness_matrix(tree_sequence) != relatedness_matrix(ts))
 # these matrixes are the same!
-#print("matrix", relatedness_matrix(ts))
-
-#wrt = relatedness(ts, ts.individuals_alive_at(0), 100)
+print("matrix", relatedness_matrix(ts) > 0)
+print("txt", True * True)
+print("fxf", False * False)
+print(relatedness_matrix(ts).shape, "?", ts.num_nodes)
+# wrt = relatedness(ts, ts.individuals_alive_at(0), 100)
 # how does relatedness and the matix work?
 k = 33333
 wrt = relatedness(ts, k, 1)
